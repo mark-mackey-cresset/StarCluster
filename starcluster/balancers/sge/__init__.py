@@ -232,8 +232,7 @@ class SGEStats(object):
     def slots_per_host(self):
         """
         Returns the number of slots per host. If for some reason the cluster is
-        inconsistent, this will return -1 for example, if you have m1.large and
-        m1.small in the same cluster
+        inconsistent, this will return the average number, rounded up.
         """
         total = self.count_total_slots()
         if total == 0:
@@ -244,8 +243,9 @@ class SGEStats(object):
                 single = self.queues.get(q).get('slots')
                 break
         if (total != (single * len(self.hosts))):
-            raise exception.BaseException(
-                "ERROR: Number of slots not consistent across cluster")
+            # Average number of slots per host, rounding up
+            avrg = round(float(total) / len(self.hosts) + 0.5)
+            return avrg
         return single
 
     def oldest_queued_job_age(self):

@@ -170,13 +170,19 @@ class SGEPlugin(clustersetup.DefaultClusterSetup):
 
     def _remove_from_sge(self, node, only_clean_master=False):
         master = self._master
-        master.ssh.execute('qconf -dattr hostgroup hostlist %s @allhosts' %
+        # SGE shutdown commands sometimes fail, but we don't generally want that
+        # aborting a removenode operation. Catch any RemoteCommandFailed exceptions
+        # (generally from 'qconf -de'), log, and move on.
+        try:
+            master.ssh.execute('qconf -dattr hostgroup hostlist %s @allhosts' %
                            node.alias)
-        master.ssh.execute('qconf -purge queue slots all.q@%s' % node.alias)
-        master.ssh.execute('qconf -dconf %s' % node.alias)
-        master.ssh.execute('qconf -de %s' % node.alias)
-        if not only_clean_master:
-            node.ssh.execute('pkill -9 sge_execd', ignore_exit_status=True)
+            master.ssh.execute('qconf -purge queue slots all.q@%s' % node.alias)
+            master.ssh.execute('qconf -dconf %s' % node.alias)
+            master.ssh.execute('qconf -de %s' % node.alias)
+            if not only_clean_master:
+                node.ssh.execute('pkill -9 sge_execd', ignore_exit_status=True)
+        except RemoteCommandFailed as e:
+            log.info(e)
         nodes = filter(lambda n: n.alias != node.alias, self._nodes)
         self._create_sge_pe(nodes=nodes)
 

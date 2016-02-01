@@ -47,9 +47,9 @@ class ImageCreator(object):
         if self.host.state != 'running':
             raise exception.InstanceNotRunning(
                 self.host.id, self.host.state,
-                self.host.dns_name or self.host.private_ip_address)
+                self.host.dns_name or self.host.ip_address)
         self.host_ssh = sshutils.SSHClient(
-            self.host.dns_name or self.host.private_ip_address,
+            self.host.dns_name or self.host.ip_address,
             username='root', private_key=key_location)
         self.description = description
         self.kernel_id = kernel_id or self.host.kernel

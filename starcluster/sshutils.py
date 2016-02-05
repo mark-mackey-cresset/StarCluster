@@ -82,6 +82,7 @@ class SSHClient(object):
         self._glob = SSHGlob(self)
         self.__last_status = None
         atexit.register(self.close)
+        log.info('Creating SSH connection for address %s' % host)
 
     def load_private_key(self, private_key, private_key_pass=None):
         # Use Private Key.

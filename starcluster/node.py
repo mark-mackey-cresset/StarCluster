@@ -1200,6 +1200,7 @@ class Node(object):
             self._ssh = sshutils.SSHClient(self.addr,
                                            username=self.user,
                                            private_key=self.key_location)
+            log.info('Creating SSH connection for %s at address %s' % (self.alias,self.addr))
         return self._ssh
 
     def shell(self, user=None, forward_x11=False, forward_agent=False,

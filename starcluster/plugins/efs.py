@@ -139,7 +139,8 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
         node.ssh.makedirs(self.mount_point, mode=0755)
         zone = node.ssh.execute('ec2metadata --availability-zone')[0]
         region = zone[:-1]
-        efs_dns = '.'.join([zone, self.fs_id, 'efs', region, 'amazonaws', 'com'])
+        name_parts = [zone, self.fs_id, 'efs', region, 'amazonaws', 'com']
+        efs_dns = '.'.join(name_parts)
         cmd = 'mount -t nfs4 -ominorversion=1 %s:/ %s' % (efs_dns,
                                                           self.mount_point)
         node.ssh.execute(cmd)

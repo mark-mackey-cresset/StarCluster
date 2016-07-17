@@ -28,14 +28,15 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
     [plugin efs]
     SETUP_CLASS = efs.EFSPlugin
     mount_point = /mnt/myefs
-    dns_name = us-west-2a.fs-1234abcd.efs.us-west-2.amazonaws.com
+    fs_id = fs-1234abcd
+
 
     """
 
-    def __init__(self, mount_point=None, dns_name=None,
+    def __init__(self, mount_point=None, fs_id=None,
                  **kwargs):
         self.mount_point = mount_point
-        self.dns_name = dns_name
+        self.fs_id = fs_id
         super(EFSPlugin, self).__init__(**kwargs)
 
     def run(self, nodes, master, user, user_shell, volumes):
@@ -81,14 +82,9 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
 
     def _authorize_efs(self):
 
-        # this is dependent on the config file using a dns, instead of
-        # an IP. a future version should be robust for both forms
-        parts = self.dns_name.split('.')
-        filesystem = parts[1]
-
         self._b3client = self._get_efs_client()
 
-        mount_targets = self._get_mount_targets(filesystem)
+        mount_targets = self._get_mount_targets(self.fs_id)
 
         for targetinfo in mount_targets:
             log.info('Authorizing EFS security group')
@@ -106,17 +102,11 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
 
     def _deauthorize_efs(self):
 
-        # this is dependent on the config file using a dns, instead of
-        # an IP. a future version should be robust for both forms
-        parts = self.dns_name.split('.')
-        filesystem = parts[1]
-
         self._b3client = self._get_efs_client()
 
-        mount_targets = self._get_mount_targets(filesystem)
+        mount_targets = self._get_mount_targets(self.fs_id)
 
         for targetinfo in mount_targets:
-            log.info('Authorizing EFS security group')
             resp = self._b3client.describe_mount_target_security_groups(
                 MountTargetId=targetinfo.get('MountTargetId'),
             )
@@ -139,19 +129,16 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
                 )
                 log.info(msg)
 
-    def _get_mount_targets(self, filesystem):
-        mtresponse = self._b3client.describe_mount_targets(
-            FileSystemId=filesystem)
+    def _get_mount_targets(self, fs_id):
+        mtresponse = self._b3client.describe_mount_targets(FileSystemId=fs_id)
         mts = mtresponse.get('MountTargets')
         return mts
 
     def _install_efs_on_node(self, node):
         node.ssh.switch_user('root')
         node.ssh.makedirs(self.mount_point, mode=0755)
-
-        parts = self.dns_name.split('.')
-        get_info_url = 'http://169.254.169.254/latest/meta-data/'
-        get_az_url = '%splacement/availability-zone' % get_info_url
-        cmd = 'mount -t nfs4 -ominorversion=1 $(curl -s %s).%s:/ %s' % (
-            get_az_url, '.'.join(parts[1:]), self.mount_point)
+        zone = node.ssh.execute('ec2metadata --availability-zone')[0]
+        region = zone[:-1]
+        efs_dns = '.'.join([zone, self.fs_id, 'efs',region,'amazonaws','com'])
+        cmd = 'mount -t nfs4 -ominorversion=1 %s:/ %s' % (efs_dns, self.mount_point)
         node.ssh.execute(cmd)

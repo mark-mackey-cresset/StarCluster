@@ -26,7 +26,7 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
     Example config:
 
     [plugin efs]
-    SETUP_CLASS = efs.EFSPlugin
+    SETUP_CLASS = starcluster.plugins.efs.EFSPlugin
     mount_point = /mnt/myefs
     fs_id = fs-1234abcd
 

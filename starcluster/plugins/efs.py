@@ -135,12 +135,18 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
         return mts
 
     def _install_efs_on_node(self, node):
-        node.ssh.switch_user('root')
-        node.ssh.makedirs(self.mount_point, mode=0755)
+        if not node.ssh.path_exists(self.mount_point):
+            node.ssh.makedirs(self.mount_point, mode=0755)
         zone = node.ssh.execute('ec2metadata --availability-zone')[0]
         region = zone[:-1]
         name_parts = [zone, self.fs_id, 'efs', region, 'amazonaws', 'com']
         efs_dns = '.'.join(name_parts)
+        mount_info = node.ssh.execute('grep %s /proc/mounts' %
+                                      self.mount_point, raise_on_failure=False)
         cmd = 'mount -t nfs4 -ominorversion=1 %s:/ %s' % (efs_dns,
                                                           self.mount_point)
-        node.ssh.execute(cmd)
+        if mount_info:
+            log.info('%s is already a mount point' % self.mount_point)
+            log.info(mount_info[0])
+        else:
+            node.ssh.execute(cmd)

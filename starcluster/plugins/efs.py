@@ -142,11 +142,12 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
         name_parts = [zone, self.fs_id, 'efs', region, 'amazonaws', 'com']
         efs_dns = '.'.join(name_parts)
         mount_info = node.ssh.execute('grep %s /proc/mounts' %
-                                      self.mount_point, raise_on_failure=False)
+                                      self.mount_point, raise_on_failure=False,
+                                      ignore_exit_status=True)
         cmd = 'mount -t nfs4 -ominorversion=1 %s:/ %s' % (efs_dns,
                                                           self.mount_point)
         if mount_info:
-            log.info('%s is already a mount point' % self.mount_point)
+            log.warn('%s is already a mount point' % self.mount_point)
             log.info(mount_info[0])
         else:
             node.ssh.execute(cmd)

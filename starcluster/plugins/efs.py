@@ -45,9 +45,9 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
 
         log.info("Configuring EFS for %s" % self._new_security_group)
         self._authorize_efs()
-        log.info("Installing nfs on all nodes")
+        log.info("Mounting efs on all nodes")
         for node in nodes:
-            log.info("  Installing nfs on %s" % node)
+            log.info("  Mounting efs on %s" % node)
             self._install_efs_on_node(node)
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):
@@ -135,12 +135,19 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
         return mts
 
     def _install_efs_on_node(self, node):
-        node.ssh.switch_user('root')
-        node.ssh.makedirs(self.mount_point, mode=0755)
+        if not node.ssh.path_exists(self.mount_point):
+            node.ssh.makedirs(self.mount_point, mode=0777)
         zone = node.ssh.execute('ec2metadata --availability-zone')[0]
         region = zone[:-1]
         name_parts = [zone, self.fs_id, 'efs', region, 'amazonaws', 'com']
         efs_dns = '.'.join(name_parts)
+        mount_info = node.ssh.execute('grep %s /proc/mounts' %
+                                      self.mount_point, raise_on_failure=False,
+                                      ignore_exit_status=True)
         cmd = 'mount -t nfs4 -ominorversion=1 %s:/ %s' % (efs_dns,
                                                           self.mount_point)
-        node.ssh.execute(cmd)
+        if mount_info:
+            log.warn('%s is already a mount point' % self.mount_point)
+            log.info(mount_info[0])
+        else:
+            node.ssh.execute(cmd)

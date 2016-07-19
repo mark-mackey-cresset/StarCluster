@@ -45,9 +45,9 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
 
         log.info("Configuring EFS for %s" % self._new_security_group)
         self._authorize_efs()
-        log.info("Installing nfs on all nodes")
+        log.info("Mounting efs on all nodes")
         for node in nodes:
-            log.info("  Installing nfs on %s" % node)
+            log.info("  Mounting efs on %s" % node)
             self._install_efs_on_node(node)
 
     def on_add_node(self, node, nodes, master, user, user_shell, volumes):

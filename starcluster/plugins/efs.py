@@ -136,7 +136,7 @@ class EFSPlugin(clustersetup.DefaultClusterSetup):
 
     def _install_efs_on_node(self, node):
         if not node.ssh.path_exists(self.mount_point):
-            node.ssh.makedirs(self.mount_point, mode=0755)
+            node.ssh.makedirs(self.mount_point, mode=0777)
         zone = node.ssh.execute('ec2metadata --availability-zone')[0]
         region = zone[:-1]
         name_parts = [zone, self.fs_id, 'efs', region, 'amazonaws', 'com']

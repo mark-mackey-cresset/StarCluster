@@ -134,6 +134,14 @@ INSTANCE_TYPES = {
     'r3.2xlarge': ['x86_64'],
     'r3.4xlarge': ['x86_64'],
     'r3.8xlarge': ['x86_64'],
+    'x1.32xlarge': ['x86_64'],
+    'x1.16xlarge': ['x86_64'],
+    'r4.large': ['x86_64'],
+    'r4.xlarge': ['x86_64'],
+    'r4.2xlarge': ['x86_64'],
+    'r4.4xlarge': ['x86_64'],
+    'r4.8xlarge': ['x86_64'],
+    'r4.16xlarge': ['x86_64'],
     'cc1.4xlarge': ['x86_64'],
     'cc2.8xlarge': ['x86_64'],
     'cg1.4xlarge': ['x86_64'],
@@ -175,7 +183,9 @@ CLUSTER_GPU_TYPES = ['g2.2xlarge', 'g2.8xlarge', 'cg1.4xlarge']
 CLUSTER_HIMEM_TYPES = ['cr1.8xlarge']
 
 HIMEM_TYPES = ['r3.large', 'r3.xlarge', 'r3.2xlarge', 'r3.4xlarge',
-               'r3.8xlarge']
+               'r3.8xlarge', 'r4.large', 'r4.xlarge', 'r4.2xlarge',
+               'r4.4xlarge', 'r4.8xlarge', 'r4.16xlarge', 'x1.32xlarge',
+               'x1.16xlarge']
 
 HI_IO_TYPES = ['hi1.4xlarge']
 
@@ -193,10 +203,10 @@ DENSE_STORAGE_TYPES = ['d2.xlarge', 'd2.2xlarge', 'd2.4xlarge', 'd2.8xlarge']
 
 HVM_ONLY_TYPES = (CLUSTER_COMPUTE_TYPES + CLUSTER_GPU_TYPES +
                   CLUSTER_HIMEM_TYPES + I2_STORAGE_TYPES + HIMEM_TYPES +
-                  T2_INSTANCE_TYPES + DENSE_STORAGE_TYPES)
+                  T2_INSTANCE_TYPES + DENSE_STORAGE_TYPES + M4_COMPUTE_TYPES)
 
 HVM_TYPES = (HVM_ONLY_TYPES + HI_IO_TYPES + HI_STORAGE_TYPES + SEC_GEN_TYPES +
-             M3_COMPUTE_TYPES + M4_COMPUTE_TYPES)
+             M3_COMPUTE_TYPES)
 
 EBS_ONLY_TYPES = T1_INSTANCE_TYPES + T2_INSTANCE_TYPES
 
@@ -205,7 +215,7 @@ EBS_ONLY_TYPES = T1_INSTANCE_TYPES + T2_INSTANCE_TYPES
 # StarCluster additionally adds cc1.4xlarge to the list - EC2 is slowly
 # migrating folks away from this type in favor of cc2.8xlarge but the type
 # still works for some older accounts.
-PLACEMENT_GROUP_TYPES = (M3_COMPUTE_TYPES + M4_COMPUTE_TYPES + HVM_ONLY_TYPES +
+PLACEMENT_GROUP_TYPES = (M3_COMPUTE_TYPES + HVM_ONLY_TYPES +
                          HI_IO_TYPES + HI_STORAGE_TYPES)
 # T2 instances are HVM_ONLY_TYPES however they're not compatible with placement
 # groups so remove them from the list

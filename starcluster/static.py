@@ -182,8 +182,8 @@ SEC_GEN_TYPES = ['m3.medium', 'm3.large', 'm3.xlarge', 'm3.2xlarge']
 CLUSTER_COMPUTE_TYPES = ['cc1.4xlarge', 'cc2.8xlarge']
 
 CLUSTER_GPU_TYPES = [
-    'p2.xlarge', 'p2.8xlarge', 'p2.16xlarge', 
-    'g2.2xlarge', 'g2.8xlarge', 
+    'p2.xlarge', 'p2.8xlarge', 'p2.16xlarge',
+    'g2.2xlarge', 'g2.8xlarge',
     'cg1.4xlarge',
 ]
 

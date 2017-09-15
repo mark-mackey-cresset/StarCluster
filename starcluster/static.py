@@ -133,16 +133,28 @@ INSTANCE_TYPES = {
     'm4.2xlarge': ['x86_64'],
     'm4.4xlarge': ['x86_64'],
     'm4.10xlarge': ['x86_64'],
+    'm4.16xlarge': ['x86_64'],
     'r3.large': ['x86_64'],
     'r3.xlarge': ['x86_64'],
     'r3.2xlarge': ['x86_64'],
     'r3.4xlarge': ['x86_64'],
     'r3.8xlarge': ['x86_64'],
+    'x1.32xlarge': ['x86_64'],
+    'x1.16xlarge': ['x86_64'],
+    'r4.large': ['x86_64'],
+    'r4.xlarge': ['x86_64'],
+    'r4.2xlarge': ['x86_64'],
+    'r4.4xlarge': ['x86_64'],
+    'r4.8xlarge': ['x86_64'],
+    'r4.16xlarge': ['x86_64'],
     'cc1.4xlarge': ['x86_64'],
     'cc2.8xlarge': ['x86_64'],
     'cg1.4xlarge': ['x86_64'],
     'g2.2xlarge': ['x86_64'],
     'g2.8xlarge': ['x86_64'],
+    'p2.xlarge': ['x86_64'],
+    'p2.8xlarge': ['x86_64'],
+    'p2.16xlarge': ['x86_64'],
     'cr1.8xlarge': ['x86_64'],
     'hi1.4xlarge': ['x86_64'],
     'hs1.8xlarge': ['x86_64'],
@@ -174,12 +186,18 @@ SEC_GEN_TYPES = ['m3.medium', 'm3.large', 'm3.xlarge', 'm3.2xlarge']
 
 CLUSTER_COMPUTE_TYPES = ['cc1.4xlarge', 'cc2.8xlarge']
 
-CLUSTER_GPU_TYPES = ['g2.2xlarge', 'g2.8xlarge', 'cg1.4xlarge']
+CLUSTER_GPU_TYPES = [
+    'p2.xlarge', 'p2.8xlarge', 'p2.16xlarge',
+    'g2.2xlarge', 'g2.8xlarge',
+    'cg1.4xlarge',
+]
 
 CLUSTER_HIMEM_TYPES = ['cr1.8xlarge']
 
 HIMEM_TYPES = ['r3.large', 'r3.xlarge', 'r3.2xlarge', 'r3.4xlarge',
-               'r3.8xlarge']
+               'r3.8xlarge', 'r4.large', 'r4.xlarge', 'r4.2xlarge',
+               'r4.4xlarge', 'r4.8xlarge', 'r4.16xlarge', 'x1.32xlarge',
+               'x1.16xlarge']
 
 HI_IO_TYPES = ['hi1.4xlarge']
 
@@ -189,8 +207,8 @@ M3_COMPUTE_TYPES = ['c3.large', 'c3.xlarge', 'c3.2xlarge', 'c3.4xlarge',
                     'c3.8xlarge']
 
 M4_COMPUTE_TYPES = ['c4.large', 'c4.xlarge', 'c4.2xlarge', 'c4.4xlarge',
-                    'c4.8xlarge', 'm4.large', 'm4.xlarge', 'm4.2xlarge', 
-                    'm4.4xlarge', 'm4.10xlarge']
+                    'c4.8xlarge', 'm4.large', 'm4.xlarge', 'm4.2xlarge',
+                    'm4.4xlarge', 'm4.10xlarge', 'm4.16xlarge']
 
 I2_STORAGE_TYPES = ['i2.xlarge', 'i2.2xlarge', 'i2.4xlarge', 'i2.8xlarge']
 
@@ -198,10 +216,10 @@ DENSE_STORAGE_TYPES = ['d2.xlarge', 'd2.2xlarge', 'd2.4xlarge', 'd2.8xlarge']
 
 HVM_ONLY_TYPES = (CLUSTER_COMPUTE_TYPES + CLUSTER_GPU_TYPES +
                   CLUSTER_HIMEM_TYPES + I2_STORAGE_TYPES + HIMEM_TYPES +
-                  T2_INSTANCE_TYPES + DENSE_STORAGE_TYPES)
+                  T2_INSTANCE_TYPES + DENSE_STORAGE_TYPES + M4_COMPUTE_TYPES)
 
 HVM_TYPES = (HVM_ONLY_TYPES + HI_IO_TYPES + HI_STORAGE_TYPES + SEC_GEN_TYPES +
-             M3_COMPUTE_TYPES + M4_COMPUTE_TYPES)
+             M3_COMPUTE_TYPES)
 
 EBS_ONLY_TYPES = T1_INSTANCE_TYPES + T2_INSTANCE_TYPES
 
@@ -210,7 +228,7 @@ EBS_ONLY_TYPES = T1_INSTANCE_TYPES + T2_INSTANCE_TYPES
 # StarCluster additionally adds cc1.4xlarge to the list - EC2 is slowly
 # migrating folks away from this type in favor of cc2.8xlarge but the type
 # still works for some older accounts.
-PLACEMENT_GROUP_TYPES = (M3_COMPUTE_TYPES + M4_COMPUTE_TYPES + HVM_ONLY_TYPES +
+PLACEMENT_GROUP_TYPES = (M3_COMPUTE_TYPES + HVM_ONLY_TYPES +
                          HI_IO_TYPES + HI_STORAGE_TYPES)
 # T2 instances are HVM_ONLY_TYPES however they're not compatible with placement
 # groups so remove them from the list
@@ -247,8 +265,8 @@ GLOBAL_SETTINGS = {
 }
 
 AWS_SETTINGS = {
-    'aws_access_key_id': (str, True, None, None, None),
-    'aws_secret_access_key': (str, True, None, None, None),
+    'aws_access_key_id': (str, False, None, None, None),
+    'aws_secret_access_key': (str, False, None, None, None),
     'aws_user_id': (str, False, None, None, None),
     'ec2_cert': (str, False, None, None, __expand_all),
     'ec2_private_key': (str, False, None, None, __expand_all),

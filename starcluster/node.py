@@ -798,7 +798,7 @@ class Node(object):
                                           remote_paths))
         self.ssh.remove_lines_from_file('/etc/fstab', remote_paths_regex)
         fstab = self.ssh.remote_file('/etc/fstab', 'a')
-        mount_opts = 'rw,exec,noauto'
+        mount_opts = 'rw,exec,noauto,noatime'
         for path in remote_paths:
             fstab.write('%s:%s %s nfs %s 0 0\n' %
                         (server_node.alias, path, path, mount_opts))
@@ -1117,7 +1117,7 @@ class Node(object):
         time.sleep(10)
         while self.update() != "stopped":
             log.info("Waiting for node " + self.alias +
-                     "to be in a stopped state.")
+                     " to be in a stopped state.")
             time.sleep(10)
         self.start()
         return False

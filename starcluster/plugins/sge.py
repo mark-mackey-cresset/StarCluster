@@ -138,7 +138,16 @@ class SGEPlugin(clustersetup.DefaultClusterSetup):
         master = self._master
         if not master.ssh.isdir(self.SGE_ROOT):
             # copy fresh sge installation files to SGE_ROOT
-            master.ssh.execute('cp -r %s %s' % (self.SGE_FRESH, self.SGE_ROOT))
+	    # Note that this has a tendency to timeout - not really clear why. Workaround
+            # is to try a few times
+            for cp_count in range(0,4):
+              try:
+                log.info('SGE install: running rsync -av %s/ %s' % (self.SGE_FRESH, self.SGE_ROOT))
+                master.ssh.execute('rsync -av %s/ %s' % (self.SGE_FRESH, self.SGE_ROOT))
+		break
+              except socket.timeout:
+                log.info("SGE copy failed: retrying")
+                time.sleep(3)  
             master.ssh.execute('chown -R %(user)s:%(user)s %(sge_root)s' %
                                {'user': self._user, 'sge_root': self.SGE_ROOT})
         self._disable_add_queue()

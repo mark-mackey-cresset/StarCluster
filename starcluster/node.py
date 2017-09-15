@@ -1283,7 +1283,7 @@ class Node(object):
         pkgs is a string that contains one or more packages separated by a
         space
         """
-        self.apt_command('update')
+        self.apt_command('update; echo done')
         self.apt_command('install %s' % pkgs)
 
     def yum_command(self, cmd):

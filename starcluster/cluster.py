@@ -895,7 +895,12 @@ class Cluster(object):
 
     @property
     def nodes(self):
-        states = ['pending', 'running']
+        states = ['pending', 'running', 'stopping', 'stopped']
+
+        # If the config is stored on the master node then we can't restore from stopped state
+        if self.config_on_master:
+          states = ['pending', 'running']
+
         filters = {'instance-state-name': states,
                    'instance.group-name': self._security_group}
         nodes = self.ec2.get_all_instances(filters=filters)
